@@ -156,8 +156,7 @@ export async function initWhackEvent() {
   let timeUp = false;
   let score = 0;
   let timeLeft = 60;
-  let timerId, spawnLoopId, cooldownInterval;
-  const COOLDOWN_TIME = 60 * 60 * 1000;
+  let timerId, spawnLoopId;
 
   currentUser = await getDiscordUser();
 
@@ -212,42 +211,6 @@ export async function initWhackEvent() {
     { id: 100, pts: -500, shiny: true, weight: 5 }
   ];
 
-  function checkCooldown() {
-    const lastPlay = localStorage.getItem('pl_last_play_time');
-    if (!lastPlay) return false;
-
-    const timePassed = Date.now() - parseInt(lastPlay);
-    if (timePassed < COOLDOWN_TIME) {
-      startBtn.disabled = true;
-      updateCooldownButton(COOLDOWN_TIME - timePassed);
-      return true;
-    }
-    startBtn.disabled = false;
-    startBtn.textContent = 'Start Aim Challenge';
-    if (cooldownInterval) clearInterval(cooldownInterval);
-    return false;
-  }
-
-  function updateCooldownButton() {
-    if (cooldownInterval) clearInterval(cooldownInterval);
-    cooldownInterval = setInterval(() => {
-      const lastPlay = localStorage.getItem('pl_last_play_time');
-      const left = COOLDOWN_TIME - (Date.now() - parseInt(lastPlay));
-
-      if (left <= 0) {
-        clearInterval(cooldownInterval);
-        startBtn.disabled = false;
-        startBtn.textContent = 'Start Aim Challenge';
-      } else {
-        const mins = Math.floor(left / 60000);
-        const secs = Math.floor((left % 60000) / 1000);
-        startBtn.textContent = `Cooldown: ${mins}m ${secs < 10 ? '0' : ''}${secs}s`;
-      }
-    }, 1000);
-  }
-
-  checkCooldown();
-
   function getRandomPokemon() {
     const totalWeight = pokemonPool.reduce((sum, p) => sum + p.weight, 0);
     let rand = Math.random() * totalWeight;
@@ -293,7 +256,6 @@ export async function initWhackEvent() {
       return;
     }
 
-    if (checkCooldown()) return;
     score = 0;
     timeLeft = 60;
     timeUp = false;
@@ -316,8 +278,8 @@ export async function initWhackEvent() {
         clearInterval(timerId);
         clearTimeout(spawnLoopId);
         timeUp = true;
-        localStorage.setItem('pl_last_play_time', Date.now());
-        checkCooldown();
+        startBtn.disabled = false;
+        startBtn.textContent = 'Start Aim Challenge';
 
         if (score > highScore) {
           highScore = score;
