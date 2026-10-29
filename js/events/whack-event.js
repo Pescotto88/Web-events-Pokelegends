@@ -1,15 +1,73 @@
 // js/events/whack-event.js
 import { loginWithDiscord, getDiscordUser, logoutDiscord } from '../discord-auth.js';
 
+// --- Supabase Database Configuration ---
+const SUPABASE_URL = "https://nyhijimwghgvsjtfbrcm.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55aGlqaW13Z2hndnNqdGZicmNtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMTExMjQsImV4cCI6MjEwODg4NzEyNH0.YaExlFywe5FT1mBAJOF3DVUSvNdo6eP6_I29Two5TKs";
+
+async function fetchGlobalLeaderboard() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?select=*&order=score.desc&limit=10`, {
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`
+      }
+    });
+    return await res.json();
+  } catch (err) {
+    console.error("Leaderboard fetch failed", err);
+    return [];
+  }
+}
+
+async function saveGlobalScore(discordId, username, score) {
+  try {
+    const getRes = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?discord_id=eq.${discordId}&select=score`, {
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`
+      }
+    });
+    const data = await getRes.json();
+
+    if (Array.isArray(data) && data.length > 0) {
+      if (score > data[0].score) {
+        await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?discord_id=eq.${discordId}`, {
+          method: 'PATCH',
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`
+          },
+          body: JSON.stringify({ username, score })
+        });
+      }
+    } else {
+      await fetch(`${SUPABASE_URL}/rest/v1/leaderboard`, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify({ discord_id: discordId, username, score })
+      });
+    }
+  } catch (err) {
+    console.error("Score submit failed", err);
+  }
+}
+
 export async function initWhackEvent() {
-  // 1. Dynamic Hero Banner
+  // Set Dynamic Hero Banner
   const heroTitle = document.getElementById('hero-title-container');
   const heroDesc = document.getElementById('hero-desc');
   
   if (heroTitle) heroTitle.innerHTML = 'Whack a <span>Mon!</span>';
   if (heroDesc) heroDesc.textContent = 'Test your reflexes in this high-speed Cobblemon event! Score 25,000+ points before time runs out to earn an exclusive in-game reward code!';
 
-  // 2. Inject Event Content UI (Arena + Sidebar with Leaderboard)
+  // Inject Event UI Content
   const container = document.getElementById('event-content');
   container.innerHTML = `
     <div class="card">
@@ -47,9 +105,8 @@ export async function initWhackEvent() {
       </div>
     </div>
 
-    <!-- Sidebar Column: Point Table + Top 10 Leaderboard -->
+    <!-- Sidebar Column: Point Table + Live Top 10 Leaderboard -->
     <div style="display: flex; flex-direction: column; gap: 25px;">
-      <!-- Point Legend -->
       <div class="card">
         <div class="card-title">Point & Rarity Table</div>
         <div class="legend-item">
@@ -74,7 +131,6 @@ export async function initWhackEvent() {
         </div>
       </div>
 
-      <!-- Top 10 Leaderboard Card -->
       <div class="card">
         <div class="card-title">
           <span>🏆 Top 10 High Scores</span>
@@ -86,7 +142,6 @@ export async function initWhackEvent() {
     </div>
   `;
 
-  // UI Elements
   const holes = container.querySelectorAll('.hole');
   const scoreBoard = container.querySelector('#score');
   const timerBoard = container.querySelector('#timer');
@@ -104,7 +159,6 @@ export async function initWhackEvent() {
   let timerId, spawnLoopId, cooldownInterval;
   const COOLDOWN_TIME = 60 * 60 * 1000;
 
-  // Check Discord Auth
   currentUser = await getDiscordUser();
 
   if (currentUser) {
@@ -126,20 +180,15 @@ export async function initWhackEvent() {
   let highScore = localStorage.getItem('pl_aim_highscore') || 0;
   highScoreBoard.textContent = highScore;
 
-  // 3. Leaderboard Rendering Logic
-  function loadLeaderboard() {
-    // Reads global scores from LocalStorage cache or fallback array
-    const rawScores = JSON.parse(localStorage.getItem('pl_global_leaderboard') || '[]');
+  async function loadLeaderboard() {
+    const rawScores = await fetchGlobalLeaderboard();
     
-    if (rawScores.length === 0) {
-      leaderboardList.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 10px 0;">No scores submitted yet. Be the first!</div>`;
+    if (!Array.isArray(rawScores) || rawScores.length === 0) {
+      leaderboardList.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 10px 0;">No global scores found. Submit one!</div>`;
       return;
     }
 
-    // Sort descending & take Top 10
-    const top10 = rawScores.sort((a, b) => b.score - a.score).slice(0, 10);
-
-    leaderboardList.innerHTML = top10.map((entry, index) => {
+    leaderboardList.innerHTML = rawScores.map((entry, index) => {
       const rankColor = index === 0 ? 'color: #fbc02d;' : index === 1 ? 'color: #c0c0c0;' : index === 2 ? 'color: #cd7f32;' : 'color: var(--text-muted);';
       return `
         <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
@@ -153,27 +202,8 @@ export async function initWhackEvent() {
     }).join('');
   }
 
-  function submitScore(user, newScore) {
-    if (!user || newScore <= 0) return;
-    let scores = JSON.parse(localStorage.getItem('pl_global_leaderboard') || '[]');
-    
-    // Check if user already has a recorded score
-    const existingIndex = scores.findIndex(s => s.id === user.id);
-    if (existingIndex !== -1) {
-      if (newScore > scores[existingIndex].score) {
-        scores[existingIndex].score = newScore;
-      }
-    } else {
-      scores.push({ id: user.id, username: user.username, score: newScore });
-    }
-
-    localStorage.setItem('pl_global_leaderboard', JSON.stringify(scores));
-    loadLeaderboard();
-  }
-
   loadLeaderboard();
 
-  // 4. Game Target Mechanics
   const pokemonPool = [
     { id: 447, pts: 200, shiny: false, weight: 40 },
     { id: 25,  pts: 300, shiny: false, weight: 25 },
@@ -279,7 +309,7 @@ export async function initWhackEvent() {
 
     spawnManager();
 
-    timerId = setInterval(() => {
+    timerId = setInterval(async () => {
       timeLeft--;
       timerBoard.textContent = timeLeft + 's';
       if (timeLeft <= 0) {
@@ -289,17 +319,15 @@ export async function initWhackEvent() {
         localStorage.setItem('pl_last_play_time', Date.now());
         checkCooldown();
 
-        // Update personal high score
         if (score > highScore) {
           highScore = score;
           localStorage.setItem('pl_aim_highscore', highScore);
           highScoreBoard.textContent = highScore;
         }
 
-        // Submit to Top 10 Leaderboard
-        submitScore(currentUser, score);
+        await saveGlobalScore(currentUser.id, currentUser.username, score);
+        await loadLeaderboard();
 
-        // Check Reward Claim
         if (score >= 25000) {
           if (localStorage.getItem(`pl_claim_whack_${currentUser.id}`)) {
             claimCodeEl.textContent = 'Account already claimed reward for this event!';
