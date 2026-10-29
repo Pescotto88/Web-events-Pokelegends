@@ -41,9 +41,9 @@
     .hero-title { font-size: 2.8rem; font-weight: 800; line-height: 1.1; margin-bottom: 12px; }
     .hero-title span { color: var(--accent-yellow); }
     .hero-desc { color: var(--text-muted); font-size: 0.95rem; max-width: 520px; line-height: 1.5; }
-    .hero-logo { max-width: 180px; filter: drop-shadow(0 0 25px rgba(138,43,226,0.4)); }
+    .hero-logo { max-width: 180px; border-radius: 12px; filter: drop-shadow(0 0 25px rgba(138,43,226,0.4)); }
 
-    .grid-layout { display: grid; grid-template-columns: 1fr 320px; gap: 25px; }
+    .grid-layout { display: grid; grid-template-columns: 1fr 320px; gap: 25px; align-items: start; }
     @media (max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } .hero { flex-direction: column; text-align: center; } }
 
     .card { background: var(--card-bg); border: 1px solid var(--border-glow); border-radius: 16px; padding: 24px; }
@@ -62,15 +62,17 @@
     .btn-action:disabled { background: rgba(255, 255, 255, 0.1); color: var(--text-muted); cursor: not-allowed; }
 
     .legend-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+    .legend-item:last-child { border-bottom: none; }
     .legend-info { display: flex; align-items: center; gap: 12px; }
     .legend-img { width: 38px; height: 38px; object-fit: contain; }
     .legend-name { font-weight: 700; font-size: 0.85rem; }
     .legend-pts { font-weight: 800; font-size: 0.85rem; }
     .pts-plus { color: #4caf50; } .pts-high { color: var(--accent-yellow); } .pts-minus { color: var(--accent-red); }
 
-    .claim-box { margin-top: 20px; background: var(--card-inner); padding: 12px; border-radius: 10px; border: 1px dashed var(--border-glow); display: flex; align-items: center; justify-content: space-between; }
-    .claim-code { font-family: monospace; font-size: 0.85rem; color: var(--accent-yellow); }
-    .btn-copy { background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
+    .claim-box { margin-top: 20px; background: var(--card-inner); padding: 12px; border-radius: 10px; border: 1px dashed var(--border-glow); display: flex; align-items: center; justify-content: space-between; min-height: 52px; }
+    .claim-code { font-family: monospace; font-size: 0.85rem; color: var(--accent-yellow); font-weight: 700; }
+    .btn-copy { background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: none; }
+    .btn-copy:hover { background: rgba(255,255,255,0.2); }
   </style>
 </head>
 <body>
@@ -92,10 +94,10 @@
     <section class="hero">
       <div>
         <div class="hero-subtitle">Poke Legends • Web Event</div>
-        <h1 class="hero-title">Active <span>Event Hub</span></h1>
-        <p class="hero-desc">Participate in limited-time web challenges to earn reward claim codes for your in-game account on PokeLegends!</p>
+        <h1 class="hero-title">Whack a <span>Mon!</span></h1>
+        <p class="hero-desc">Test your reflexes in this high-speed Cobblemon event! Score 25,000+ points before time runs out to earn an exclusive in-game reward code!</p>
       </div>
-      <img src="assets/pokelegends.jpg" alt="PokeLegends" class="hero-logo" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png'">
+      <img src="assets/pokelegends.jpg" alt="PokeLegends Logo" class="hero-logo" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png'">
     </section>
 
     <!-- DYNAMIC EVENT CONTAINER -->
