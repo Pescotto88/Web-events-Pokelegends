@@ -112,7 +112,7 @@
 
     /* Layout Main */
     main {
-      max-width: 1000px;
+      max-width: 1100px;
       margin: 35px auto;
       padding: 0 20px;
       flex: 1;
@@ -163,11 +163,11 @@
     /* Main Grid Layout */
     .grid-layout {
       display: grid;
-      grid-template-columns: 1fr 300px;
+      grid-template-columns: 1fr 320px;
       gap: 25px;
     }
 
-    @media (max-width: 850px) {
+    @media (max-width: 900px) {
       .grid-layout {
         grid-template-columns: 1fr;
       }
@@ -223,39 +223,49 @@
       color: #fff;
     }
 
-    /* Whack Grid */
+    /* Whack Arena Grid (4x4) */
     .arena-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
       margin-bottom: 20px;
     }
 
     .hole {
       background: var(--card-inner);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      height: 120px;
+      height: 105px;
       border-radius: 12px;
       position: relative;
       overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: flex-end;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.15s, background-color 0.15s;
+    }
+
+    .hole:hover {
+      border-color: var(--accent-purple);
+    }
+
+    .hole:active {
+      background-color: rgba(138, 43, 226, 0.15);
     }
 
     .mole {
-      width: 70px;
-      height: 70px;
+      width: 65px;
+      height: 65px;
       object-fit: contain;
       position: absolute;
-      bottom: -90px;
-      transition: bottom 0.2s ease-out;
-      cursor: pointer;
-      user-select: none;
+      bottom: -80px;
+      transition: bottom 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
     }
 
     .hole.up .mole {
-      bottom: 20px;
+      bottom: 18px;
     }
 
     .btn-action {
@@ -316,7 +326,7 @@
     }
 
     .pts-plus { color: #4caf50; }
-    .pts-shiny { color: var(--accent-yellow); }
+    .pts-high { color: var(--accent-yellow); }
     .pts-minus { color: var(--accent-red); }
 
     /* Claim Container */
@@ -333,7 +343,7 @@
 
     .claim-code {
       font-family: monospace;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--accent-yellow);
     }
 
@@ -368,8 +378,8 @@
     <section class="hero">
       <div>
         <div class="hero-subtitle">Poke Legends • Web Event</div>
-        <h1 class="hero-title">Whack a <span>Cobblemon.</span></h1>
-        <p class="hero-desc">Catch Pokémon before they retreat into the tall grass. Reach target thresholds to earn reward codes for your in-game account.</p>
+        <h1 class="hero-title">Cobblemon <span>Aim Challenge</span></h1>
+        <p class="hero-desc">Fast-paced target reflex event. Click active boxes before Pokémon submerge. Watch out for Voltorb traps and reach 10,000 points to claim your reward code!</p>
       </div>
       <img src="assets/pokelegends.jpg" alt="PokeLegends" class="hero-logo" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png'">
     </section>
@@ -378,8 +388,8 @@
       <!-- Main Game Arena -->
       <div class="card">
         <div class="card-title">
-          <span>Active Event Arena</span>
-          <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Time Limit: 30s</span>
+          <span>Aim Challenge Arena (4x4)</span>
+          <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Time Limit: 60s</span>
         </div>
 
         <div class="hud">
@@ -389,7 +399,7 @@
           </div>
           <div class="hud-item">
             <div class="hud-label">Time</div>
-            <div class="hud-value" id="timer">30s</div>
+            <div class="hud-value" id="timer">60s</div>
           </div>
           <div class="hud-item">
             <div class="hud-label">High Score</div>
@@ -398,6 +408,14 @@
         </div>
 
         <div class="arena-grid">
+          <!-- 16 Holes for Aim Challenge -->
+          <div class="hole"><img class="mole" src="" alt=""></div>
+          <div class="hole"><img class="mole" src="" alt=""></div>
+          <div class="hole"><img class="mole" src="" alt=""></div>
+          <div class="hole"><img class="mole" src="" alt=""></div>
+          <div class="hole"><img class="mole" src="" alt=""></div>
+          <div class="hole"><img class="mole" src="" alt=""></div>
+          <div class="hole"><img class="mole" src="" alt=""></div>
           <div class="hole"><img class="mole" src="" alt=""></div>
           <div class="hole"><img class="mole" src="" alt=""></div>
           <div class="hole"><img class="mole" src="" alt=""></div>
@@ -409,48 +427,56 @@
           <div class="hole"><img class="mole" src="" alt=""></div>
         </div>
 
-        <button class="btn-action" id="start-btn" onclick="startGame()">Start Web Event</button>
+        <button class="btn-action" id="start-btn" onclick="startGame()">Start Aim Challenge</button>
 
         <div class="claim-box">
-          <span class="claim-code" id="claim-code">Score 1,000 pts to unlock reward</span>
+          <span class="claim-code" id="claim-code">Reach 10,000 pts to unlock reward</span>
           <button class="btn-copy" onclick="copyCode()">Copy Code</button>
         </div>
       </div>
 
       <!-- Point Legend Sidebar -->
       <div class="card">
-        <div class="card-title">Point Table</div>
-
-        <div class="legend-item">
-          <div class="legend-info">
-            <img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/25.gif" alt="Pikachu">
-            <span class="legend-name">Pikachu / Kanto</span>
-          </div>
-          <span class="legend-pts pts-plus">+100</span>
-        </div>
+        <div class="card-title">Point & Rarity Table</div>
 
         <div class="legend-item">
           <div class="legend-info">
             <img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/143.gif" alt="Snorlax">
-            <span class="legend-name">Snorlax</span>
+            <span class="legend-name">Snorlax (Rare)</span>
           </div>
-          <span class="legend-pts pts-plus">+150</span>
+          <span class="legend-pts pts-high">+500</span>
         </div>
 
         <div class="legend-item">
           <div class="legend-info">
-            <img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/25.gif" alt="Shiny Pikachu">
-            <span class="legend-name">Shiny Pikachu</span>
+            <img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/25.gif" alt="Pikachu">
+            <span class="legend-name">Pikachu</span>
           </div>
-          <span class="legend-pts pts-shiny">+500</span>
+          <span class="legend-pts pts-plus">+300</span>
+        </div>
+
+        <div class="legend-item">
+          <div class="legend-info">
+            <img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/447.gif" alt="Riolu">
+            <span class="legend-name">Riolu (Common)</span>
+          </div>
+          <span class="legend-pts pts-plus">+200</span>
         </div>
 
         <div class="legend-item">
           <div class="legend-info">
             <img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/100.gif" alt="Voltorb">
-            <span class="legend-name">Rocket Voltorb</span>
+            <span class="legend-name">Voltorb Trap</span>
           </div>
           <span class="legend-pts pts-minus">-200</span>
+        </div>
+
+        <div class="legend-item">
+          <div class="legend-info">
+            <img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/100.gif" alt="Shiny Voltorb">
+            <span class="legend-name">Shiny Voltorb Trap</span>
+          </div>
+          <span class="legend-pts pts-minus">-500</span>
         </div>
       </div>
     </div>
@@ -458,77 +484,94 @@
 
   <script>
     const holes = document.querySelectorAll('.hole');
-    const moles = document.querySelectorAll('.mole');
     const scoreBoard = document.querySelector('#score');
     const timerBoard = document.querySelector('#timer');
     const highScoreBoard = document.querySelector('#high-score');
     const claimCodeEl = document.querySelector('#claim-code');
     const startBtn = document.querySelector('#start-btn');
 
-    let lastHole;
     let timeUp = false;
     let score = 0;
-    let timeLeft = 30;
+    let timeLeft = 60;
     let timerId;
-    let highScore = localStorage.getItem('pl_whack_highscore') || 0;
+    let spawnLoopId;
+    let highScore = localStorage.getItem('pl_aim_highscore') || 0;
     highScoreBoard.textContent = highScore;
 
+    // Weighted Pokemon spawn chances
     const pokemonPool = [
-      { id: 25, pts: 100, shiny: false },
-      { id: 4, pts: 100, shiny: false },
-      { id: 1, pts: 100, shiny: false },
-      { id: 143, pts: 150, shiny: false },
-      { id: 25, pts: 500, shiny: true },
-      { id: 100, pts: -200, shiny: false }
+      { id: 447, pts: 200, shiny: false, weight: 40 },  // Riolu (Most Common)
+      { id: 25,  pts: 300, shiny: false, weight: 25 },  // Pikachu
+      { id: 100, pts: -200, shiny: false, weight: 20 }, // Voltorb Trap
+      { id: 143, pts: 500, shiny: false, weight: 10 },  // Snorlax (Rare)
+      { id: 100, pts: -500, shiny: true, weight: 5 }   // Shiny Voltorb Trap (Rare)
     ];
 
-    function randomTime(min, max) {
-      return Math.round(Math.random() * (max - min) + min);
+    function getRandomPokemon() {
+      const totalWeight = pokemonPool.reduce((sum, p) => sum + p.weight, 0);
+      let rand = Math.random() * totalWeight;
+      for (const p of pokemonPool) {
+        if (rand < p.weight) return p;
+        rand -= p.weight;
+      }
+      return pokemonPool[0];
     }
 
-    function randomHole(holes) {
-      const idx = Math.floor(Math.random() * holes.length);
-      const hole = holes[idx];
-      if (hole === lastHole) return randomHole(holes);
-      lastHole = hole;
-      return hole;
-    }
+    function popSingle() {
+      if (timeUp) return;
 
-    function popUp() {
-      const time = randomTime(600, 1100);
-      const hole = randomHole(holes);
+      // Find inactive holes
+      const availableHoles = Array.from(holes).filter(h => !h.classList.contains('up'));
+      if (availableHoles.length === 0) return;
+
+      const hole = availableHoles[Math.floor(Math.random() * availableHoles.length)];
       const mole = hole.querySelector('.mole');
-      const pokemon = pokemonPool[Math.floor(Math.random() * pokemonPool.length)];
+      const pokemon = getRandomPokemon();
 
       const spriteType = pokemon.shiny ? 'showdown/shiny' : 'showdown';
       mole.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/${spriteType}/${pokemon.id}.gif`;
-      mole.dataset.pts = pokemon.pts;
-      mole.dataset.active = "true";
+      hole.dataset.pts = pokemon.pts;
+      hole.dataset.active = "true";
 
       hole.classList.add('up');
 
+      const stayTime = Math.round(Math.random() * (700 - 450) + 450); // Fast popup for aim practice
+
       setTimeout(() => {
         hole.classList.remove('up');
-        mole.dataset.active = "false";
-        if (!timeUp) popUp();
-      }, time);
+        hole.dataset.active = "false";
+      }, stayTime);
+    }
+
+    function spawnManager() {
+      if (timeUp) return;
+
+      // Simultaneous popups: 1 to 3 targets at a time
+      const spawnCount = Math.floor(Math.random() * 3) + 1;
+      for (let i = 0; i < spawnCount; i++) {
+        popSingle();
+      }
+
+      const nextInterval = Math.round(Math.random() * (500 - 300) + 300);
+      spawnLoopId = setTimeout(spawnManager, nextInterval);
     }
 
     function startGame() {
       score = 0;
-      timeLeft = 30;
+      timeLeft = 60;
       timeUp = false;
       scoreBoard.textContent = 0;
-      timerBoard.textContent = '30s';
+      timerBoard.textContent = '60s';
       startBtn.disabled = true;
 
-      popUp();
+      spawnManager();
 
       timerId = setInterval(() => {
         timeLeft--;
         timerBoard.textContent = timeLeft + 's';
         if (timeLeft <= 0) {
           clearInterval(timerId);
+          clearTimeout(spawnLoopId);
           timeUp = true;
           startBtn.disabled = false;
           checkHighScore();
@@ -536,34 +579,34 @@
       }, 1000);
     }
 
-    // Attach click strictly to the mole sprite, NOT the empty box
-    moles.forEach(mole => {
-      mole.addEventListener('click', function(e) {
+    // Entire box container hit listener
+    holes.forEach(hole => {
+      hole.addEventListener('click', function(e) {
         if (!e.isTrusted) return;
         if (this.dataset.active !== "true") return;
 
-        const pts = parseInt(this.dataset.pts || 100);
+        const pts = parseInt(this.dataset.pts || 0);
         score += pts;
         if (score < 0) score = 0;
         scoreBoard.textContent = score;
 
         this.dataset.active = "false";
-        this.parentElement.classList.remove('up');
+        this.classList.remove('up');
       });
     });
 
     function checkHighScore() {
       if (score > highScore) {
         highScore = score;
-        localStorage.setItem('pl_whack_highscore', highScore);
+        localStorage.setItem('pl_aim_highscore', highScore);
         highScoreBoard.textContent = highScore;
       }
 
-      if (score >= 1000) {
-        const code = 'PL-WHACK-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      if (score >= 10000) {
+        const code = 'PL-AIM-' + Math.random().toString(36).substring(2, 8).toUpperCase();
         claimCodeEl.textContent = `/claim ${code}`;
       } else {
-        claimCodeEl.textContent = 'Min score not reached (1,000 pts)';
+        claimCodeEl.textContent = 'Min score not reached (10,000 pts)';
       }
     }
 
