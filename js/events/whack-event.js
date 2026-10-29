@@ -1,20 +1,23 @@
 // js/events/whack-event.js
+import { loginWithDiscord, getDiscordUser, logoutDiscord } from '../discord-auth.js';
 
-export function initWhackEvent() {
-  // 1. Dynamically set the Hero Title and Description for this specific event
+export async function initWhackEvent() {
+  // Set Dynamic Hero Banner
   const heroTitle = document.getElementById('hero-title-container');
   const heroDesc = document.getElementById('hero-desc');
   
   if (heroTitle) heroTitle.innerHTML = 'Whack a <span>Mon!</span>';
   if (heroDesc) heroDesc.textContent = 'Test your reflexes in this high-speed Cobblemon event! Score 25,000+ points before time runs out to earn an exclusive in-game reward code!';
 
-  // 2. Inject Event Content
+  // Inject Event Content UI
   const container = document.getElementById('event-content');
   container.innerHTML = `
     <div class="card">
       <div class="card-title">
         <span>Aim Challenge Arena (4x4)</span>
-        <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Time Limit: 60s</span>
+        <div id="user-badge" style="font-size: 0.85rem; font-weight: 700;">
+          <button id="discord-login-btn" style="background: #5865F2; color: #fff; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 700; cursor: pointer;">Login with Discord</button>
+        </div>
       </div>
 
       <div class="hud">
@@ -39,7 +42,7 @@ export function initWhackEvent() {
       <button class="btn-action" id="start-btn">Start Aim Challenge</button>
 
       <div class="claim-box">
-        <span class="claim-code" id="claim-code">⚡ Score 25,000+ pts to unlock your server reward code!</span>
+        <span class="claim-code" id="claim-code">⚡ Log in with Discord & score 25,000+ pts to unlock your code!</span>
         <button class="btn-copy" id="copy-btn">Copy Code</button>
       </div>
     </div>
@@ -70,7 +73,7 @@ export function initWhackEvent() {
     </div>
   `;
 
-  // 3. Game Logic
+  // UI Elements
   const holes = container.querySelectorAll('.hole');
   const scoreBoard = container.querySelector('#score');
   const timerBoard = container.querySelector('#timer');
@@ -78,12 +81,34 @@ export function initWhackEvent() {
   const claimCodeEl = container.querySelector('#claim-code');
   const startBtn = container.querySelector('#start-btn');
   const copyBtn = container.querySelector('#copy-btn');
+  const userBadge = container.querySelector('#user-badge');
 
+  let currentUser = null;
   let timeUp = false;
   let score = 0;
   let timeLeft = 60;
   let timerId, spawnLoopId, cooldownInterval;
   const COOLDOWN_TIME = 60 * 60 * 1000;
+
+  // Check Discord Authentication
+  currentUser = await getDiscordUser();
+
+  if (currentUser) {
+    userBadge.innerHTML = `
+      <span style="color: var(--accent-yellow);">@${currentUser.username}</span>
+      <button id="discord-logout-btn" style="background: rgba(255,255,255,0.1); color: var(--text-muted); border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; margin-left: 8px; cursor: pointer;">Logout</button>
+    `;
+    container.querySelector('#discord-logout-btn').addEventListener('click', logoutDiscord);
+
+    // Check if this Discord user has already claimed this event locally
+    const existingClaim = localStorage.getItem(`pl_claim_whack_${currentUser.id}`);
+    if (existingClaim) {
+      claimCodeEl.textContent = `Already Claimed: ${existingClaim}`;
+      copyBtn.style.display = 'inline-block';
+    }
+  } else {
+    container.querySelector('#discord-login-btn').addEventListener('click', loginWithDiscord);
+  }
 
   let highScore = localStorage.getItem('pl_aim_highscore') || 0;
   highScoreBoard.textContent = highScore;
@@ -171,6 +196,12 @@ export function initWhackEvent() {
   }
 
   startBtn.addEventListener('click', () => {
+    if (!currentUser) {
+      alert('Please log in with Discord before starting!');
+      loginWithDiscord();
+      return;
+    }
+
     if (checkCooldown()) return;
     score = 0;
     timeLeft = 60;
@@ -178,8 +209,12 @@ export function initWhackEvent() {
     scoreBoard.textContent = 0;
     timerBoard.textContent = '60s';
     startBtn.disabled = true;
-    copyBtn.style.display = 'none';
-    claimCodeEl.textContent = '⚡ Score 25,000+ pts to unlock your server reward code!';
+
+    const existingClaim = localStorage.getItem(`pl_claim_whack_${currentUser.id}`);
+    if (!existingClaim) {
+      copyBtn.style.display = 'none';
+      claimCodeEl.textContent = '⚡ Score 25,000+ pts to unlock your server reward code!';
+    }
 
     spawnManager();
 
@@ -200,12 +235,21 @@ export function initWhackEvent() {
         }
 
         if (score >= 25000) {
-          const code = 'PL-WHACK-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-          claimCodeEl.textContent = `/claim ${code}`;
-          copyBtn.style.display = 'inline-block';
+          // Verify if Discord ID already claimed
+          if (localStorage.getItem(`pl_claim_whack_${currentUser.id}`)) {
+            claimCodeEl.textContent = 'Account already claimed reward for this event!';
+            copyBtn.style.display = 'none';
+          } else {
+            const code = 'PL-WHACK-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            localStorage.setItem(`pl_claim_whack_${currentUser.id}`, `/claim ${code}`);
+            claimCodeEl.textContent = `/claim ${code}`;
+            copyBtn.style.display = 'inline-block';
+          }
         } else {
-          claimCodeEl.textContent = `Almost! You scored ${score.toLocaleString()} pts (Need 25,000 pts)`;
-          copyBtn.style.display = 'none';
+          if (!localStorage.getItem(`pl_claim_whack_${currentUser.id}`)) {
+            claimCodeEl.textContent = `Almost! You scored ${score.toLocaleString()} pts (Need 25,000 pts)`;
+            copyBtn.style.display = 'none';
+          }
         }
       }
     }, 1000);
@@ -224,8 +268,9 @@ export function initWhackEvent() {
 
   copyBtn.addEventListener('click', () => {
     const code = claimCodeEl.textContent;
-    if (code.startsWith('/claim')) {
-      navigator.clipboard.writeText(code);
+    if (code.startsWith('/claim') || code.startsWith('Already Claimed:')) {
+      const cleanCode = code.replace('Already Claimed: ', '');
+      navigator.clipboard.writeText(cleanCode);
       alert('Reward code copied to clipboard!');
     }
   });
