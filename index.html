@@ -30,8 +30,10 @@
     .brand img { height: 38px; border-radius: 6px; }
     .brand-title { font-weight: 800; font-size: 1.15rem; color: #fff; }
     .nav-links { display: flex; gap: 20px; align-items: center; }
-    .nav-link { color: var(--text-muted); text-decoration: none; font-weight: 600; font-size: 0.9rem; }
-    .nav-btn { background: #8a2be2; color: #fff; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.85rem; }
+    .nav-link { color: var(--text-muted); text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: color 0.2s; }
+    .nav-link:hover { color: #fff; }
+    .nav-btn { background: #8a2be2; color: #fff; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.85rem; transition: background 0.2s; }
+    .nav-btn:hover { background: #9d3bf0; }
 
     main { max-width: 1100px; margin: 35px auto; padding: 0 20px; flex: 1; width: 100%; }
     .hero { display: flex; align-items: center; justify-content: space-between; gap: 30px; margin-bottom: 35px; }
@@ -80,7 +82,7 @@
         <span class="brand-title">POKE LEGENDS</span>
       </a>
       <div class="nav-links">
-        <a href="https://36ff8e4d.pokelegends-stats.pages.dev" target="_blank" class="nav-link">Tournaments</a>
+        <a href="https://pokelegends-stats.pages.dev/" target="_blank" class="nav-link">Tournaments</a>
         <a href="https://store.poke-legends.com" target="_blank" class="nav-btn">Store ↗</a>
       </div>
     </div>
