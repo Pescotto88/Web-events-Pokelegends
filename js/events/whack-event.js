@@ -1,9 +1,15 @@
 // js/events/whack-event.js
 
 export function initWhackEvent() {
-  const container = document.getElementById('event-content');
+  // 1. Dynamically set the Hero Title and Description for this specific event
+  const heroTitle = document.getElementById('hero-title-container');
+  const heroDesc = document.getElementById('hero-desc');
   
-  // 1. Inject UI HTML
+  if (heroTitle) heroTitle.innerHTML = 'Whack a <span>Mon!</span>';
+  if (heroDesc) heroDesc.textContent = 'Test your reflexes in this high-speed Cobblemon event! Score 25,000+ points before time runs out to earn an exclusive in-game reward code!';
+
+  // 2. Inject Event Content
+  const container = document.getElementById('event-content');
   container.innerHTML = `
     <div class="card">
       <div class="card-title">
@@ -33,7 +39,7 @@ export function initWhackEvent() {
       <button class="btn-action" id="start-btn">Start Aim Challenge</button>
 
       <div class="claim-box">
-        <span class="claim-code" id="claim-code">Reach 20,000 pts to unlock reward</span>
+        <span class="claim-code" id="claim-code">⚡ Score 25,000+ pts to unlock your server reward code!</span>
         <button class="btn-copy" id="copy-btn">Copy Code</button>
       </div>
     </div>
@@ -64,7 +70,7 @@ export function initWhackEvent() {
     </div>
   `;
 
-  // 2. Event Game Logic
+  // 3. Game Logic
   const holes = container.querySelectorAll('.hole');
   const scoreBoard = container.querySelector('#score');
   const timerBoard = container.querySelector('#timer');
@@ -154,14 +160,14 @@ export function initWhackEvent() {
     setTimeout(() => {
       hole.classList.remove('up');
       hole.dataset.active = "false";
-    }, Math.round(Math.random() * (700 - 450) + 450));
+    }, Math.round(Math.random() * (900 - 650) + 650));
   }
 
   function spawnManager() {
     if (timeUp) return;
     const count = Math.floor(Math.random() * 3) + 1;
     for (let i = 0; i < count; i++) popSingle();
-    spawnLoopId = setTimeout(spawnManager, Math.round(Math.random() * (500 - 300) + 300));
+    spawnLoopId = setTimeout(spawnManager, Math.round(Math.random() * (600 - 400) + 400));
   }
 
   startBtn.addEventListener('click', () => {
@@ -172,6 +178,8 @@ export function initWhackEvent() {
     scoreBoard.textContent = 0;
     timerBoard.textContent = '60s';
     startBtn.disabled = true;
+    copyBtn.style.display = 'none';
+    claimCodeEl.textContent = '⚡ Score 25,000+ pts to unlock your server reward code!';
 
     spawnManager();
 
@@ -191,11 +199,13 @@ export function initWhackEvent() {
           highScoreBoard.textContent = highScore;
         }
 
-        if (score >= 20000) {
-          const code = 'PL-AIM-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        if (score >= 25000) {
+          const code = 'PL-WHACK-' + Math.random().toString(36).substring(2, 8).toUpperCase();
           claimCodeEl.textContent = `/claim ${code}`;
+          copyBtn.style.display = 'inline-block';
         } else {
-          claimCodeEl.textContent = 'Min score not reached (20,000 pts)';
+          claimCodeEl.textContent = `Almost! You scored ${score.toLocaleString()} pts (Need 25,000 pts)`;
+          copyBtn.style.display = 'none';
         }
       }
     }, 1000);
@@ -216,7 +226,7 @@ export function initWhackEvent() {
     const code = claimCodeEl.textContent;
     if (code.startsWith('/claim')) {
       navigator.clipboard.writeText(code);
-      alert('Code copied to clipboard!');
+      alert('Reward code copied to clipboard!');
     }
   });
 }
