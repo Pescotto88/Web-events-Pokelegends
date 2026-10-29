@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PokeLegends - Web Event: Whack-a-Cobblemon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #09070f;
+      --card-bg: #130f24;
+      --accent-yellow: #fbc02d;
+      --accent-purple: #8a2be2;
+      --accent-cyan: #00f0ff;
+      --text-main: #f3f0ff;
+      --text-muted: #a39bb8;
+      --border-glow: rgba(138, 43, 226, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Navbar */
+    header {
+      background: rgba(19, 15, 36, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-glow);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 12px 24px;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand img {
+      height: 42px;
+      width: auto;
+      border-radius: 6px;
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 1.2rem;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #fff 0%, var(--accent-yellow) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: #fff;
+    }
+
+    .nav-btn {
+      background: linear-gradient(135deg, #8a2be2, #4a00e0);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.9rem;
+      box-shadow: 0 0 15px rgba(138, 43, 226, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .nav-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 25px rgba(138, 43, 226, 0.7);
+    }
+
+    /* Main Container */
+    main {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 20px;
+      flex: 1;
+      width: 100%;
+    }
+
+    /* Hero Banner */
+    .event-hero {
+      background: linear-gradient(180deg, #1b1535 0%, var(--card-bg) 100%);
+      border: 1px solid var(--border-glow);
+      border-radius: 20px;
+      padding: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .hero-content {
+      max-width: 550px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(251, 192, 45, 0.15);
+      color: var(--accent-yellow);
+      border: 1px solid rgba(251, 192, 45, 0.3);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .hero-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+
+    .hero-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .hero-img {
+      max-width: 200px;
+      filter: drop-shadow(0 0 20px rgba(138,43,226,0.5));
+    }
+
+    /* Game Arena Section */
+    .game-section {
+      background: var(--card-bg);
+      border: 1px solid var(--border-glow);
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 30px;
+    }
+
+    .hud {
+      display: flex;
+      justify-content: space-around;
+      background: rgba(9, 7, 15, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 25px;
+    }
+
+    .hud-box {
+      text-align: center;
+    }
+
+    .hud-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .hud-value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--accent-cyan);
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      max-width: 600px;
+      margin: 0 auto 25px auto;
+    }
+
+    .hole {
+      background: #0d0a1a;
+      border: 2px solid #221c38;
+      height: 140px;
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: inset 0 10px 20px rgba(0,0,0,0.8);
+      transition: border-color 0.2s;
+    }
+
+    .hole:hover {
+      border-color: var(--accent-purple);
+    }
+
+    .mole {
+      width: 80px;
+      height: 80px;
+      position: absolute;
+      bottom: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: bottom 0.2s ease-out;
+      pointer-events: none;
+      object-fit: contain;
+    }
+
+    .hole.up .mole {
+      bottom: 25px;
+    }
+
+    .game-controls {
+      text-align: center;
+    }
+
+    .btn-start {
+      background: linear-gradient(135deg, var(--accent-yellow), #f57c00);
+      color: #000;
+      font-weight: 800;
+      font-size: 1.1rem;
+      padding: 14px 40px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(251, 192, 45, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-start:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(251, 192, 45, 0.7);
+    }
+
+    /* Claim Section */
+    .claim-section {
+      background: var(--card-bg);
+      border: 1px solid var(--border-glow);
+      border-radius: 20px;
+      padding: 25px;
+    }
+
+    .claim-header {
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-bottom: 15px;
+    }
+
+    .claim-box {
+      display: flex;
+      gap: 10px;
+      background: #09070f;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px dashed var(--border-glow);
+      align-items: center;
+    }
+
+    .claim-code {
+      font-family: monospace;
+      font-size: 1.1rem;
+      color: var(--accent-yellow);
+      flex: 1;
+    }
+
+    .btn-copy {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-copy:hover {
+      background: rgba(255,255,255,0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="nav-container">
+      <a href="#" class="brand">
+        <img src="assets/pokelegends.jpg" alt="PokeLegends Logo" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png'">
+        <span class="brand-title">POKE LEGENDS</span>
+      </a>
+      <div class="nav-links">
+        <a href="https://36ff8e4d.pokelegends-stats.pages.dev" target="_blank" class="nav-link">Tournaments</a>
+        <a href="https://store.poke-legends.com" target="_blank" class="nav-btn">Store ↗</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="event-hero">
+      <div class="hero-content">
+        <span class="badge">Evento Web Activo</span>
+        <h1 class="hero-title">Whack-a-Cobblemon!</h1>
+        <p class="hero-desc">Atrapa a los Pokémon antes de que se escondan en las hierbas altas. ¡Consigue la mayor puntuación posible para reclamar tus premios dentro del servidor!</p>
+      </div>
+      <img src="assets/pokelegends.jpg" alt="Logo Evento" class="hero-img" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png'">
+    </section>
+
+    <section class="game-section">
+      <div class="hud">
+        <div class="hud-box">
+          <div class="hud-label">Puntos</div>
+          <div class="hud-value" id="score">0</div>
+        </div>
+        <div class="hud-box">
+          <div class="hud-label">Tiempo</div>
+          <div class="hud-value" id="timer">30s</div>
+        </div>
+        <div class="hud-box">
+          <div class="hud-label">Récord</div>
+          <div class="hud-value" id="high-score">0</div>
+        </div>
+      </div>
+
+      <div class="grid-container">
+        <div class="hole"><img class="mole" src="" alt="poke"></div>
+        <div class="hole"><img class="mole" src="" alt="poke"></div>
+        <div class="hole"><img class="mole" src="" alt="poke"></div>
+        <div class="hole"><img class="mole" src="" alt="poke"></div>
+        <div class="hole"><img class="mole" src="" alt="poke"></div>
+        <div class="hole"><img class="mole" src="" alt="poke"></div>
+        <div class="hole"><img class="mole" src="" alt="poke"></div>
+        <div class="hole"><img class="mole" src="" alt="poke"></div>
+        <div class="hole"><img class="mole" src="" alt="poke"></div>
+      </div>
+
+      <div class="game-controls">
+        <button class="btn-start" id="start-btn" onclick="startGame()">¡Iniciar Evento!</button>
+      </div>
+    </section>
+
+    <section class="claim-section">
+      <div class="claim-header">Reclamar Recompensa In-Game</div>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">Alcanza al menos 1,000 puntos para generar tu código único y usarlo dentro del servidor de Minecraft.</p>
+      <div class="claim-box">
+        <span class="claim-code" id="claim-code">Consigue 1,000 pts para desbloquear</span>
+        <button class="btn-copy" onclick="copyCode()">Copiar</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const holes = document.querySelectorAll('.hole');
+    const scoreBoard = document.querySelector('#score');
+    const timerBoard = document.querySelector('#timer');
+    const highScoreBoard = document.querySelector('#high-score');
+    const claimCodeEl = document.querySelector('#claim-code');
+
+    let lastHole;
+    let timeUp = false;
+    let score = 0;
+    let timeLeft = 30;
+    let timerId;
+    let highScore = localStorage.getItem('pl_whack_highscore') || 0;
+    highScoreBoard.textContent = highScore;
+
+    const pokemonPool = [
+      { id: 25, pts: 100, shiny: false },
+      { id: 4, pts: 100, shiny: false },
+      { id: 1, pts: 100, shiny: false },
+      { id: 143, pts: 150, shiny: false },
+      { id: 25, pts: 500, shiny: true },
+      { id: 100, pts: -200, shiny: false } // Voltorb / Trap
+    ];
+
+    function randomTime(min, max) {
+      return Math.round(Math.random() * (max - min) + min);
+    }
+
+    function randomHole(holes) {
+      const idx = Math.floor(Math.random() * holes.length);
+      const hole = holes[idx];
+      if (hole === lastHole) return randomHole(holes);
+      lastHole = hole;
+      return hole;
+    }
+
+    function popUp() {
+      const time = randomTime(600, 1200);
+      const hole = randomHole(holes);
+      const mole = hole.querySelector('.mole');
+      const pokemon = pokemonPool[Math.floor(Math.random() * pokemonPool.length)];
+
+      const spriteType = pokemon.shiny ? 'showdown/shiny' : 'showdown';
+      mole.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/${spriteType}/${pokemon.id}.gif`;
+      mole.dataset.pts = pokemon.pts;
+
+      hole.classList.add('up');
+
+      setTimeout(() => {
+        hole.classList.remove('up');
+        if (!timeUp) popUp();
+      }, time);
+    }
+
+    function startGame() {
+      score = 0;
+      timeLeft = 30;
+      timeUp = false;
+      scoreBoard.textContent = 0;
+      timerBoard.textContent = '30s';
+      document.querySelector('#start-btn').disabled = true;
+
+      popUp();
+
+      timerId = setInterval(() => {
+        timeLeft--;
+        timerBoard.textContent = timeLeft + 's';
+        if (timeLeft <= 0) {
+          clearInterval(timerId);
+          timeUp = true;
+          document.querySelector('#start-btn').disabled = false;
+          checkHighScore();
+        }
+      }, 1000);
+    }
+
+    function bonk(e) {
+      if (!e.isTrusted) return;
+      const hole = this;
+      const mole = hole.querySelector('.mole');
+      const pts = parseInt(mole.dataset.pts || 100);
+
+      score += pts;
+      if (score < 0) score = 0;
+      scoreBoard.textContent = score;
+      hole.classList.remove('up');
+    }
+
+    holes.forEach(hole => hole.addEventListener('click', bonk));
+
+    function checkHighScore() {
+      if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('pl_whack_highscore', highScore);
+        highScoreBoard.textContent = highScore;
+      }
+
+      if (score >= 1000) {
+        const code = 'PL-WHACK-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        claimCodeEl.textContent = `/claim ${code}`;
+      } else {
+        claimCodeEl.textContent = 'Puntuación insuficiente (Mín. 1,000 pts)';
+      }
+    }
+
+    function copyCode() {
+      const code = claimCodeEl.textContent;
+      if (code.startsWith('/claim')) {
+        navigator.clipboard.writeText(code);
+        alert('¡Código copiado al portapapeles!');
+      }
+    }
+  </script>
+</body>
+</html>
