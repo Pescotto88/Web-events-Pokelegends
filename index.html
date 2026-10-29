@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,14 +9,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #09070f;
-      --card-bg: #130f24;
+      --bg-dark: #0e0b16;
+      --card-bg: #161224;
+      --card-inner: #1c172e;
       --accent-yellow: #fbc02d;
       --accent-purple: #8a2be2;
       --accent-cyan: #00f0ff;
+      --accent-red: #ff4d4d;
       --text-main: #f3f0ff;
       --text-muted: #a39bb8;
-      --border-glow: rgba(138, 43, 226, 0.3);
+      --border-glow: rgba(138, 43, 226, 0.25);
     }
 
     * {
@@ -35,19 +37,19 @@
       overflow-x: hidden;
     }
 
-    /* Navbar */
+    /* Top Navigation */
     header {
-      background: rgba(19, 15, 36, 0.85);
+      background: rgba(22, 18, 36, 0.9);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border-glow);
       position: sticky;
       top: 0;
       z-index: 100;
-      padding: 12px 24px;
+      padding: 14px 28px;
     }
 
     .nav-container {
-      max-width: 1200px;
+      max-width: 1100px;
       margin: 0 auto;
       display: flex;
       justify-content: space-between;
@@ -63,18 +65,16 @@
     }
 
     .brand img {
-      height: 42px;
+      height: 38px;
       width: auto;
       border-radius: 6px;
     }
 
     .brand-title {
       font-weight: 800;
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       letter-spacing: 0.5px;
-      background: linear-gradient(135deg, #fff 0%, var(--accent-yellow) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #fff;
     }
 
     .nav-links {
@@ -87,7 +87,7 @@
       color: var(--text-muted);
       text-decoration: none;
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       transition: color 0.2s;
     }
 
@@ -96,221 +96,256 @@
     }
 
     .nav-btn {
-      background: linear-gradient(135deg, #8a2be2, #4a00e0);
+      background: #8a2be2;
       color: #fff;
-      padding: 8px 16px;
+      padding: 8px 18px;
       border-radius: 8px;
       text-decoration: none;
       font-weight: 700;
-      font-size: 0.9rem;
-      box-shadow: 0 0 15px rgba(138, 43, 226, 0.4);
-      transition: transform 0.2s, box-shadow 0.2s;
+      font-size: 0.85rem;
+      transition: background 0.2s;
     }
 
     .nav-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 25px rgba(138, 43, 226, 0.7);
+      background: #9d3bf0;
     }
 
-    /* Main Container */
+    /* Layout Main */
     main {
       max-width: 1000px;
-      margin: 30px auto;
+      margin: 35px auto;
       padding: 0 20px;
       flex: 1;
       width: 100%;
     }
 
     /* Hero Banner */
-    .event-hero {
-      background: linear-gradient(180deg, #1b1535 0%, var(--card-bg) 100%);
-      border: 1px solid var(--border-glow);
-      border-radius: 20px;
-      padding: 30px;
+    .hero {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 30px;
-      margin-bottom: 30px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      margin-bottom: 35px;
     }
 
-    .hero-content {
-      max-width: 550px;
-    }
-
-    .badge {
-      display: inline-block;
-      background: rgba(251, 192, 45, 0.15);
+    .hero-subtitle {
       color: var(--accent-yellow);
-      border: 1px solid rgba(251, 192, 45, 0.3);
-      padding: 4px 12px;
-      border-radius: 20px;
       font-size: 0.8rem;
-      font-weight: 700;
+      font-weight: 800;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .hero-title {
-      font-size: 2.2rem;
+      font-size: 2.8rem;
       font-weight: 800;
-      margin-bottom: 10px;
-      line-height: 1.2;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+
+    .hero-title span {
+      color: var(--accent-yellow);
     }
 
     .hero-desc {
       color: var(--text-muted);
       font-size: 0.95rem;
+      max-width: 520px;
       line-height: 1.5;
     }
 
-    .hero-img {
-      max-width: 200px;
-      filter: drop-shadow(0 0 20px rgba(138,43,226,0.5));
+    .hero-logo {
+      max-width: 180px;
+      filter: drop-shadow(0 0 25px rgba(138,43,226,0.4));
     }
 
-    /* Game Arena Section */
-    .game-section {
+    /* Main Grid Layout */
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 25px;
+    }
+
+    @media (max-width: 850px) {
+      .grid-layout {
+        grid-template-columns: 1fr;
+      }
+      .hero {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    /* Cards */
+    .card {
       background: var(--card-bg);
       border: 1px solid var(--border-glow);
-      border-radius: 20px;
-      padding: 25px;
-      margin-bottom: 30px;
+      border-radius: 16px;
+      padding: 24px;
     }
 
-    .hud {
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 18px;
       display: flex;
-      justify-content: space-around;
-      background: rgba(9, 7, 15, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 25px;
+      align-items: center;
+      justify-content: space-between;
     }
 
-    .hud-box {
+    /* HUD */
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .hud-item {
+      background: var(--card-inner);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 12px;
+      border-radius: 10px;
       text-align: center;
     }
 
     .hud-label {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: var(--text-muted);
-      text-transform: uppercase;
       font-weight: 700;
+      text-transform: uppercase;
     }
 
     .hud-value {
-      font-size: 1.6rem;
+      font-size: 1.5rem;
       font-weight: 800;
-      color: var(--accent-cyan);
+      color: #fff;
     }
 
-    .grid-container {
+    /* Whack Grid */
+    .arena-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-      max-width: 600px;
-      margin: 0 auto 25px auto;
+      gap: 12px;
+      margin-bottom: 20px;
     }
 
     .hole {
-      background: #0d0a1a;
-      border: 2px solid #221c38;
-      height: 140px;
-      border-radius: 16px;
+      background: var(--card-inner);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      height: 120px;
+      border-radius: 12px;
       position: relative;
       overflow: hidden;
-      cursor: pointer;
-      box-shadow: inset 0 10px 20px rgba(0,0,0,0.8);
-      transition: border-color 0.2s;
-    }
-
-    .hole:hover {
-      border-color: var(--accent-purple);
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
     }
 
     .mole {
-      width: 80px;
-      height: 80px;
-      position: absolute;
-      bottom: -100px;
-      left: 50%;
-      transform: translateX(-50%);
-      transition: bottom 0.2s ease-out;
-      pointer-events: none;
+      width: 70px;
+      height: 70px;
       object-fit: contain;
+      position: absolute;
+      bottom: -90px;
+      transition: bottom 0.2s ease-out;
+      cursor: pointer;
+      user-select: none;
     }
 
     .hole.up .mole {
-      bottom: 25px;
+      bottom: 20px;
     }
 
-    .game-controls {
-      text-align: center;
-    }
-
-    .btn-start {
-      background: linear-gradient(135deg, var(--accent-yellow), #f57c00);
-      color: #000;
+    .btn-action {
+      width: 100%;
+      background: var(--accent-yellow);
+      color: #0e0b16;
       font-weight: 800;
-      font-size: 1.1rem;
-      padding: 14px 40px;
+      font-size: 1rem;
+      padding: 12px;
       border: none;
-      border-radius: 12px;
+      border-radius: 10px;
       cursor: pointer;
-      box-shadow: 0 0 20px rgba(251, 192, 45, 0.4);
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: opacity 0.2s;
     }
 
-    .btn-start:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 30px rgba(251, 192, 45, 0.7);
+    .btn-action:hover {
+      opacity: 0.9;
     }
 
-    /* Claim Section */
-    .claim-section {
-      background: var(--card-bg);
-      border: 1px solid var(--border-glow);
-      border-radius: 20px;
-      padding: 25px;
+    .btn-action:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
-    .claim-header {
-      font-size: 1.2rem;
-      font-weight: 800;
-      margin-bottom: 15px;
-    }
-
-    .claim-box {
+    /* Legend Sidebar */
+    .legend-item {
       display: flex;
-      gap: 10px;
-      background: #09070f;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .legend-item:last-child {
+      border-bottom: none;
+    }
+
+    .legend-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .legend-img {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+    }
+
+    .legend-name {
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .legend-pts {
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    .pts-plus { color: #4caf50; }
+    .pts-shiny { color: var(--accent-yellow); }
+    .pts-minus { color: var(--accent-red); }
+
+    /* Claim Container */
+    .claim-box {
+      margin-top: 20px;
+      background: var(--card-inner);
       padding: 12px;
       border-radius: 10px;
       border: 1px dashed var(--border-glow);
+      display: flex;
       align-items: center;
+      justify-content: space-between;
     }
 
     .claim-code {
       font-family: monospace;
-      font-size: 1.1rem;
+      font-size: 0.9rem;
       color: var(--accent-yellow);
-      flex: 1;
     }
 
     .btn-copy {
       background: rgba(255,255,255,0.1);
       color: #fff;
       border: none;
-      padding: 8px 16px;
+      padding: 6px 12px;
       border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
       cursor: pointer;
-      font-weight: 600;
-    }
-
-    .btn-copy:hover {
-      background: rgba(255,255,255,0.2);
     }
   </style>
 </head>
@@ -319,7 +354,7 @@
   <header>
     <div class="nav-container">
       <a href="#" class="brand">
-        <img src="assets/pokelegends.jpg" alt="PokeLegends Logo" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png'">
+        <img src="assets/pokelegends.jpg" alt="Logo" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png'">
         <span class="brand-title">POKE LEGENDS</span>
       </a>
       <div class="nav-links">
@@ -330,64 +365,105 @@
   </header>
 
   <main>
-    <section class="event-hero">
-      <div class="hero-content">
-        <span class="badge">Evento Web Activo</span>
-        <h1 class="hero-title">Whack-a-Cobblemon!</h1>
-        <p class="hero-desc">Atrapa a los Pokémon antes de que se escondan en las hierbas altas. ¡Consigue la mayor puntuación posible para reclamar tus premios dentro del servidor!</p>
+    <section class="hero">
+      <div>
+        <div class="hero-subtitle">Poke Legends • Web Event</div>
+        <h1 class="hero-title">Whack a <span>Cobblemon.</span></h1>
+        <p class="hero-desc">Catch Pokémon before they retreat into the tall grass. Reach target thresholds to earn reward codes for your in-game account.</p>
       </div>
-      <img src="assets/pokelegends.jpg" alt="Logo Evento" class="hero-img" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png'">
+      <img src="assets/pokelegends.jpg" alt="PokeLegends" class="hero-logo" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png'">
     </section>
 
-    <section class="game-section">
-      <div class="hud">
-        <div class="hud-box">
-          <div class="hud-label">Puntos</div>
-          <div class="hud-value" id="score">0</div>
+    <div class="grid-layout">
+      <!-- Main Game Arena -->
+      <div class="card">
+        <div class="card-title">
+          <span>Active Event Arena</span>
+          <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Time Limit: 30s</span>
         </div>
-        <div class="hud-box">
-          <div class="hud-label">Tiempo</div>
-          <div class="hud-value" id="timer">30s</div>
+
+        <div class="hud">
+          <div class="hud-item">
+            <div class="hud-label">Score</div>
+            <div class="hud-value" id="score">0</div>
+          </div>
+          <div class="hud-item">
+            <div class="hud-label">Time</div>
+            <div class="hud-value" id="timer">30s</div>
+          </div>
+          <div class="hud-item">
+            <div class="hud-label">High Score</div>
+            <div class="hud-value" id="high-score">0</div>
+          </div>
         </div>
-        <div class="hud-box">
-          <div class="hud-label">Récord</div>
-          <div class="hud-value" id="high-score">0</div>
+
+        <div class="arena-grid">
+          <div class="hole"><img class="mole" src="" alt=""></div>
+          <div class="hole"><img class="mole" src="" alt=""></div>
+          <div class="hole"><img class="mole" src="" alt=""></div>
+          <div class="hole"><img class="mole" src="" alt=""></div>
+          <div class="hole"><img class="mole" src="" alt=""></div>
+          <div class="hole"><img class="mole" src="" alt=""></div>
+          <div class="hole"><img class="mole" src="" alt=""></div>
+          <div class="hole"><img class="mole" src="" alt=""></div>
+          <div class="hole"><img class="mole" src="" alt=""></div>
+        </div>
+
+        <button class="btn-action" id="start-btn" onclick="startGame()">Start Web Event</button>
+
+        <div class="claim-box">
+          <span class="claim-code" id="claim-code">Score 1,000 pts to unlock reward</span>
+          <button class="btn-copy" onclick="copyCode()">Copy Code</button>
         </div>
       </div>
 
-      <div class="grid-container">
-        <div class="hole"><img class="mole" src="" alt="poke"></div>
-        <div class="hole"><img class="mole" src="" alt="poke"></div>
-        <div class="hole"><img class="mole" src="" alt="poke"></div>
-        <div class="hole"><img class="mole" src="" alt="poke"></div>
-        <div class="hole"><img class="mole" src="" alt="poke"></div>
-        <div class="hole"><img class="mole" src="" alt="poke"></div>
-        <div class="hole"><img class="mole" src="" alt="poke"></div>
-        <div class="hole"><img class="mole" src="" alt="poke"></div>
-        <div class="hole"><img class="mole" src="" alt="poke"></div>
-      </div>
+      <!-- Point Legend Sidebar -->
+      <div class="card">
+        <div class="card-title">Point Table</div>
 
-      <div class="game-controls">
-        <button class="btn-start" id="start-btn" onclick="startGame()">¡Iniciar Evento!</button>
-      </div>
-    </section>
+        <div class="legend-item">
+          <div class="legend-info">
+            <img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/25.gif" alt="Pikachu">
+            <span class="legend-name">Pikachu / Kanto</span>
+          </div>
+          <span class="legend-pts pts-plus">+100</span>
+        </div>
 
-    <section class="claim-section">
-      <div class="claim-header">Reclamar Recompensa In-Game</div>
-      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">Alcanza al menos 1,000 puntos para generar tu código único y usarlo dentro del servidor de Minecraft.</p>
-      <div class="claim-box">
-        <span class="claim-code" id="claim-code">Consigue 1,000 pts para desbloquear</span>
-        <button class="btn-copy" onclick="copyCode()">Copiar</button>
+        <div class="legend-item">
+          <div class="legend-info">
+            <img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/143.gif" alt="Snorlax">
+            <span class="legend-name">Snorlax</span>
+          </div>
+          <span class="legend-pts pts-plus">+150</span>
+        </div>
+
+        <div class="legend-item">
+          <div class="legend-info">
+            <img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/25.gif" alt="Shiny Pikachu">
+            <span class="legend-name">Shiny Pikachu</span>
+          </div>
+          <span class="legend-pts pts-shiny">+500</span>
+        </div>
+
+        <div class="legend-item">
+          <div class="legend-info">
+            <img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/100.gif" alt="Voltorb">
+            <span class="legend-name">Rocket Voltorb</span>
+          </div>
+          <span class="legend-pts pts-minus">-200</span>
+        </div>
       </div>
-    </section>
+    </div>
   </main>
 
   <script>
     const holes = document.querySelectorAll('.hole');
+    const moles = document.querySelectorAll('.mole');
     const scoreBoard = document.querySelector('#score');
     const timerBoard = document.querySelector('#timer');
     const highScoreBoard = document.querySelector('#high-score');
     const claimCodeEl = document.querySelector('#claim-code');
+    const startBtn = document.querySelector('#start-btn');
 
     let lastHole;
     let timeUp = false;
@@ -403,7 +479,7 @@
       { id: 1, pts: 100, shiny: false },
       { id: 143, pts: 150, shiny: false },
       { id: 25, pts: 500, shiny: true },
-      { id: 100, pts: -200, shiny: false } // Voltorb / Trap
+      { id: 100, pts: -200, shiny: false }
     ];
 
     function randomTime(min, max) {
@@ -419,7 +495,7 @@
     }
 
     function popUp() {
-      const time = randomTime(600, 1200);
+      const time = randomTime(600, 1100);
       const hole = randomHole(holes);
       const mole = hole.querySelector('.mole');
       const pokemon = pokemonPool[Math.floor(Math.random() * pokemonPool.length)];
@@ -427,11 +503,13 @@
       const spriteType = pokemon.shiny ? 'showdown/shiny' : 'showdown';
       mole.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/${spriteType}/${pokemon.id}.gif`;
       mole.dataset.pts = pokemon.pts;
+      mole.dataset.active = "true";
 
       hole.classList.add('up');
 
       setTimeout(() => {
         hole.classList.remove('up');
+        mole.dataset.active = "false";
         if (!timeUp) popUp();
       }, time);
     }
@@ -442,7 +520,7 @@
       timeUp = false;
       scoreBoard.textContent = 0;
       timerBoard.textContent = '30s';
-      document.querySelector('#start-btn').disabled = true;
+      startBtn.disabled = true;
 
       popUp();
 
@@ -452,25 +530,27 @@
         if (timeLeft <= 0) {
           clearInterval(timerId);
           timeUp = true;
-          document.querySelector('#start-btn').disabled = false;
+          startBtn.disabled = false;
           checkHighScore();
         }
       }, 1000);
     }
 
-    function bonk(e) {
-      if (!e.isTrusted) return;
-      const hole = this;
-      const mole = hole.querySelector('.mole');
-      const pts = parseInt(mole.dataset.pts || 100);
+    // Attach click strictly to the mole sprite, NOT the empty box
+    moles.forEach(mole => {
+      mole.addEventListener('click', function(e) {
+        if (!e.isTrusted) return;
+        if (this.dataset.active !== "true") return;
 
-      score += pts;
-      if (score < 0) score = 0;
-      scoreBoard.textContent = score;
-      hole.classList.remove('up');
-    }
+        const pts = parseInt(this.dataset.pts || 100);
+        score += pts;
+        if (score < 0) score = 0;
+        scoreBoard.textContent = score;
 
-    holes.forEach(hole => hole.addEventListener('click', bonk));
+        this.dataset.active = "false";
+        this.parentElement.classList.remove('up');
+      });
+    });
 
     function checkHighScore() {
       if (score > highScore) {
@@ -483,7 +563,7 @@
         const code = 'PL-WHACK-' + Math.random().toString(36).substring(2, 8).toUpperCase();
         claimCodeEl.textContent = `/claim ${code}`;
       } else {
-        claimCodeEl.textContent = 'Puntuación insuficiente (Mín. 1,000 pts)';
+        claimCodeEl.textContent = 'Min score not reached (1,000 pts)';
       }
     }
 
@@ -491,7 +571,7 @@
       const code = claimCodeEl.textContent;
       if (code.startsWith('/claim')) {
         navigator.clipboard.writeText(code);
-        alert('¡Código copiado al portapapeles!');
+        alert('Code copied to clipboard!');
       }
     }
   </script>
