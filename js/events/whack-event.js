@@ -2,14 +2,14 @@
 import { loginWithDiscord, getDiscordUser, logoutDiscord } from '../discord-auth.js';
 
 export async function initWhackEvent() {
-  // Set Dynamic Hero Banner
+  // 1. Dynamic Hero Banner
   const heroTitle = document.getElementById('hero-title-container');
   const heroDesc = document.getElementById('hero-desc');
   
   if (heroTitle) heroTitle.innerHTML = 'Whack a <span>Mon!</span>';
   if (heroDesc) heroDesc.textContent = 'Test your reflexes in this high-speed Cobblemon event! Score 25,000+ points before time runs out to earn an exclusive in-game reward code!';
 
-  // Inject Event Content UI
+  // 2. Inject Event Content UI (Arena + Sidebar with Leaderboard)
   const container = document.getElementById('event-content');
   container.innerHTML = `
     <div class="card">
@@ -47,28 +47,41 @@ export async function initWhackEvent() {
       </div>
     </div>
 
-    <!-- Point Legend Sidebar -->
-    <div class="card">
-      <div class="card-title">Point & Rarity Table</div>
-      <div class="legend-item">
-        <div class="legend-info"><img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/143.gif"><span class="legend-name">Snorlax (Rare)</span></div>
-        <span class="legend-pts pts-high">+500</span>
+    <!-- Sidebar Column: Point Table + Top 10 Leaderboard -->
+    <div style="display: flex; flex-direction: column; gap: 25px;">
+      <!-- Point Legend -->
+      <div class="card">
+        <div class="card-title">Point & Rarity Table</div>
+        <div class="legend-item">
+          <div class="legend-info"><img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/143.gif"><span class="legend-name">Snorlax (Rare)</span></div>
+          <span class="legend-pts pts-high">+500</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-info"><img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/25.gif"><span class="legend-name">Pikachu</span></div>
+          <span class="legend-pts pts-plus">+300</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-info"><img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/447.gif"><span class="legend-name">Riolu (Common)</span></div>
+          <span class="legend-pts pts-plus">+200</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-info"><img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/100.gif"><span class="legend-name">Voltorb Trap</span></div>
+          <span class="legend-pts pts-minus">-200</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-info"><img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/100.gif"><span class="legend-name">Shiny Voltorb Trap</span></div>
+          <span class="legend-pts pts-minus">-500</span>
+        </div>
       </div>
-      <div class="legend-item">
-        <div class="legend-info"><img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/25.gif"><span class="legend-name">Pikachu</span></div>
-        <span class="legend-pts pts-plus">+300</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-info"><img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/447.gif"><span class="legend-name">Riolu (Common)</span></div>
-        <span class="legend-pts pts-plus">+200</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-info"><img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/100.gif"><span class="legend-name">Voltorb Trap</span></div>
-        <span class="legend-pts pts-minus">-200</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-info"><img class="legend-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/100.gif"><span class="legend-name">Shiny Voltorb Trap</span></div>
-        <span class="legend-pts pts-minus">-500</span>
+
+      <!-- Top 10 Leaderboard Card -->
+      <div class="card">
+        <div class="card-title">
+          <span>🏆 Top 10 High Scores</span>
+        </div>
+        <div id="leaderboard-list">
+          <div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 10px 0;">Loading leaderboard...</div>
+        </div>
       </div>
     </div>
   `;
@@ -82,6 +95,7 @@ export async function initWhackEvent() {
   const startBtn = container.querySelector('#start-btn');
   const copyBtn = container.querySelector('#copy-btn');
   const userBadge = container.querySelector('#user-badge');
+  const leaderboardList = container.querySelector('#leaderboard-list');
 
   let currentUser = null;
   let timeUp = false;
@@ -90,7 +104,7 @@ export async function initWhackEvent() {
   let timerId, spawnLoopId, cooldownInterval;
   const COOLDOWN_TIME = 60 * 60 * 1000;
 
-  // Check Discord Authentication
+  // Check Discord Auth
   currentUser = await getDiscordUser();
 
   if (currentUser) {
@@ -100,7 +114,6 @@ export async function initWhackEvent() {
     `;
     container.querySelector('#discord-logout-btn').addEventListener('click', logoutDiscord);
 
-    // Check if this Discord user has already claimed this event locally
     const existingClaim = localStorage.getItem(`pl_claim_whack_${currentUser.id}`);
     if (existingClaim) {
       claimCodeEl.textContent = `Already Claimed: ${existingClaim}`;
@@ -113,6 +126,54 @@ export async function initWhackEvent() {
   let highScore = localStorage.getItem('pl_aim_highscore') || 0;
   highScoreBoard.textContent = highScore;
 
+  // 3. Leaderboard Rendering Logic
+  function loadLeaderboard() {
+    // Reads global scores from LocalStorage cache or fallback array
+    const rawScores = JSON.parse(localStorage.getItem('pl_global_leaderboard') || '[]');
+    
+    if (rawScores.length === 0) {
+      leaderboardList.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 10px 0;">No scores submitted yet. Be the first!</div>`;
+      return;
+    }
+
+    // Sort descending & take Top 10
+    const top10 = rawScores.sort((a, b) => b.score - a.score).slice(0, 10);
+
+    leaderboardList.innerHTML = top10.map((entry, index) => {
+      const rankColor = index === 0 ? 'color: #fbc02d;' : index === 1 ? 'color: #c0c0c0;' : index === 2 ? 'color: #cd7f32;' : 'color: var(--text-muted);';
+      return `
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-weight: 800; font-size: 0.85rem; width: 18px; ${rankColor}">#${index + 1}</span>
+            <span style="font-weight: 700; font-size: 0.85rem;">@${entry.username}</span>
+          </div>
+          <span style="font-weight: 800; font-size: 0.85rem; color: var(--accent-yellow);">${entry.score.toLocaleString()}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function submitScore(user, newScore) {
+    if (!user || newScore <= 0) return;
+    let scores = JSON.parse(localStorage.getItem('pl_global_leaderboard') || '[]');
+    
+    // Check if user already has a recorded score
+    const existingIndex = scores.findIndex(s => s.id === user.id);
+    if (existingIndex !== -1) {
+      if (newScore > scores[existingIndex].score) {
+        scores[existingIndex].score = newScore;
+      }
+    } else {
+      scores.push({ id: user.id, username: user.username, score: newScore });
+    }
+
+    localStorage.setItem('pl_global_leaderboard', JSON.stringify(scores));
+    loadLeaderboard();
+  }
+
+  loadLeaderboard();
+
+  // 4. Game Target Mechanics
   const pokemonPool = [
     { id: 447, pts: 200, shiny: false, weight: 40 },
     { id: 25,  pts: 300, shiny: false, weight: 25 },
@@ -228,14 +289,18 @@ export async function initWhackEvent() {
         localStorage.setItem('pl_last_play_time', Date.now());
         checkCooldown();
 
+        // Update personal high score
         if (score > highScore) {
           highScore = score;
           localStorage.setItem('pl_aim_highscore', highScore);
           highScoreBoard.textContent = highScore;
         }
 
+        // Submit to Top 10 Leaderboard
+        submitScore(currentUser, score);
+
+        // Check Reward Claim
         if (score >= 25000) {
-          // Verify if Discord ID already claimed
           if (localStorage.getItem(`pl_claim_whack_${currentUser.id}`)) {
             claimCodeEl.textContent = 'Account already claimed reward for this event!';
             copyBtn.style.display = 'none';
